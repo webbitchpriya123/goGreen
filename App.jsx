@@ -8,9 +8,12 @@ LogBox.ignoreLogs(["Warning: ..."]);
 LogBox.ignoreAllLogs();
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Splash from './src/screens/splash';
+import Splash from './src/screens/Splash';
+import Otp from './src/screens/Otp';
+import Home from './src/screens/Home';
+import BookRequest from './src/screens/BookRequest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import PickUpDetail from './src/screens/PickupDetail'
 
 function App() {
   const Stack = createNativeStackNavigator();
@@ -20,11 +23,13 @@ function App() {
     loadStoredValue();
   }, []);
 
-
-
   const screens = [
     { name: 'Splash', component: Splash },
-    
+    { name: 'Otp', component: Otp },
+    { name: 'Home', component: Home },
+    { name: 'PickUpDetail', component: PickUpDetail },
+    { name: 'BookRequest', component: BookRequest },
+
 
 
 
