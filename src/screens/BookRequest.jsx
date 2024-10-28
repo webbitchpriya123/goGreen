@@ -24,16 +24,11 @@ export default function BookRequest(props) {
             const currentDate = selectedDate || date;
             setShow(false); // Hide the DateTimePicker
             const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-
-
             setDateVal(formattedDate);
-
         } else {
             setShow(false); // Hide DateTimePicker if user dismisses it
         }
     };
-
-
 
 
     return (
@@ -45,7 +40,6 @@ export default function BookRequest(props) {
                     }>
                         <AntDesign name="left" color="black" size={25} />
                     </TouchableOpacity>
-
                     <Text style={styles.book}>Book a Request</Text>
                 </View>
                 <View style={{ margin: 15 }}>
@@ -135,7 +129,6 @@ export default function BookRequest(props) {
                             />
                         </View>
                     </View>
-
                 </View>
             </View>
 
@@ -150,10 +143,9 @@ export default function BookRequest(props) {
             )}
 
             <View style={styles.flex1}>
-                <TouchableOpacity onPress={()=>props.navigation.navigate('Success')} style={styles.submitView}>
+                <TouchableOpacity onPress={() => props.navigation.navigate('Success')} style={styles.submitView}>
                     <Text style={styles.submit}>Submit</Text>
                 </TouchableOpacity>
-
             </View>
 
         </SafeAreaView>
@@ -177,7 +169,6 @@ const styles = StyleSheet.create({
     placeholderStyle: {
         fontSize: 14,
         color: '#7F8192',
-
     },
     selectedTextStyle: {
         fontSize: 14,

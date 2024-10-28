@@ -15,6 +15,8 @@ import BookRequest from './src/screens/BookRequest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PickUpDetail from './src/screens/PickupDetail';
 import Success from './src/screens/Success';
+import WaterDay from './src/screens/WaterDay';
+
 
 function App() {
   const Stack = createNativeStackNavigator();
@@ -30,12 +32,8 @@ function App() {
     { name: 'Home', component: Home },
     { name: 'PickUpDetail', component: PickUpDetail },
     { name: 'BookRequest', component: BookRequest },
+    { name: 'WaterDay', component: WaterDay },
     { name: 'Success', component: Success },
-
-
-
-
-
   ];
 
   const loadStoredValue = async () => {
@@ -64,7 +62,7 @@ function App() {
           animationTypeForReplace: 'pop',
           gestureEnabled: true,
         }}
-        initialRouteName={localValue ? "Home" : "BookRequest"}
+        initialRouteName={localValue ? "Home" : "Home"}
       >
         {screens.map((item) => (
           <Stack.Screen key={item.name} name={item.name} component={item.component} />

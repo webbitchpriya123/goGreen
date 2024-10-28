@@ -51,13 +51,13 @@ const bannerView = ({ props }) => {
     return (
         <View>
             {banners?.length > 0 ?
-                <View>
+                <View >
                     <ScrollView
                         pagingEnabled
                         horizontal
                         onScroll={scrolls}
                         showsHorizontalScrollIndicator={false}
-                        style={{ marginTop: 15, marginLeft: 5 }}
+                        style={{ marginTop: 10, marginLeft: 5 }}
                     >
                         {banners.map((item, index) => (
                             <TouchableOpacity

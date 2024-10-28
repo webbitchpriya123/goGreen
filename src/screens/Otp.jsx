@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView,Image, Text, FlatList, ScrollView, TouchableOpacity, View, Dimensions, StatusBar, StyleSheet } from "react-native";
+import { SafeAreaView, Image, Text, FlatList, ScrollView, TouchableOpacity, View, Dimensions, StatusBar, StyleSheet } from "react-native";
 import Header from "../component/header";
 import BannerView from '../component/bannerView';
 import * as Color from '../constant/colors';
 import pickUp from '../assests/pickup.png';
 import vendor from '../assests/vendor.png';
 import water from '../assests/water.png';
-import RBSheet from 'react-native-raw-bottom-sheet';
 import Feather from 'react-native-vector-icons/Feather';
 import OTPInputView from '@twotalltotems/react-native-otp-input'
 
@@ -14,15 +13,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input'
 const windowWidth = Dimensions.get('window').width;
 
 export default function Otp(props) {
-    const refRBSheet = useRef();
     const [mobile, setMobile] = useState('');
-
-
-    useEffect(() => {
-        // refRBSheet.current.open();
-
-    }, [])
-
     const categoryList = [
         {
             image: vendor,
@@ -55,7 +46,7 @@ export default function Otp(props) {
                         </View>
                         <FlatList
                             data={categoryList}
-                            style={{marginBottom:40}}
+                            style={{ marginBottom: 40 }}
                             horizontal
                             contentContainerStyle={{ width: windowWidth - 30, justifyContent: 'space-between' }}
                             showsHorizontalScrollIndicator={false}
@@ -78,13 +69,13 @@ export default function Otp(props) {
                     <Text style={styles.login}>Verify OTP</Text>
                 </View>
                 <View style={{ margin: 15 }}>
-                    <Text style={{fontWeight:'400',fontSize:13,color:'#666666'}}>OTP sent to mobile number : 98765 45678</Text>
+                    <Text style={{ fontWeight: '400', fontSize: 13, color: '#666666' }}>OTP sent to mobile number : 98765 45678</Text>
                     <OTPInputView
                         codeInputFieldStyle={styles.underlineStyleBase}
                         style={styles.otpContainer}
                         pinCount={4}
                     />
-                    <TouchableOpacity onPress={()=>props.navigation.navigate('Home')} style={{ backgroundColor: '#67C306', width: '30%', marginTop: 16, borderRadius: 10,alignSelf:'center' }}>
+                    <TouchableOpacity onPress={() => props.navigation.navigate('Home')} style={{ backgroundColor: '#67C306', width: '30%', marginTop: 16, borderRadius: 10, alignSelf: 'center' }}>
                         <Text style={{ color: Color.white, padding: 13, textAlign: 'center', fontSize: 16 }}>Continue</Text>
                     </TouchableOpacity>
                 </View>

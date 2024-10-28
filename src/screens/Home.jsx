@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, TextInput, Image, Text, FlatList, ScrollView, TouchableOpacity, View, Dimensions, StatusBar, StyleSheet } from "react-native";
 import BackHeader from "../component/backHeader";
 import * as Color from '../constant/colors';
@@ -6,14 +6,18 @@ import home from '../assests/home.png';
 import industry from '../assests/industry.png';
 import vendorRegister from '../assests/vendorRegister.png';
 import { Dropdown } from 'react-native-element-dropdown';
+import { getAllState } from "../allApi/getAllApi";
 
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function Home(props) {
-
     const [Index, setIndex] = useState('');
-    const [indexVal , setIndexVal] = useState(false);
+    const [indexVal, setIndexVal] = useState(false);
+    const [states, setStates] = useState([]);
+    const [countries, setCountries] = useState([]);
+    const [town, setTown] = useState([]);
+    const [area, setAreas] = useState([]);
     const [State, setState] = useState({
         name: '',
         email: '',
@@ -25,15 +29,15 @@ export default function Home(props) {
         industry: ''
     })
 
-    const states = [
-        {
+    useEffect(() => {
+        allStates();
+    }, []);
 
-        }
-    ]
+    const allStates = async () => {
 
-    const countries = [
+        const all = await getAllState();
 
-    ]
+    }
 
 
     const categoryList = [
@@ -64,29 +68,27 @@ export default function Home(props) {
             <StatusBar
                 backgroundColor={Color.white}
             />
-
-
             <BackHeader props={props} />
-            <ScrollView showsVerticalScrollIndicator={false} >
-                <View style={styles.horizontal}>
-                    <Text style={styles.links}>Select User Type</Text>
-                    <Text style={styles.content}>Lorem ipsum dolor sit amet, consectetur.</Text>
-                    <FlatList
-                        data={categoryList}
-                        horizontal
-                        contentContainerStyle={{ width: windowWidth - 33, justifyContent: 'space-between' }}
-                        showsHorizontalScrollIndicator={false}
-                        renderItem={({ item, index }) => <TouchableOpacity onPress={() => {
-                            setIndex(index),
+            <View style={styles.horizontal}>
+                <Text style={styles.links}>Select User Type</Text>
+                <Text style={styles.content}>Lorem ipsum dolor sit amet, consectetur.</Text>
+                <FlatList
+                    data={categoryList}
+                    horizontal
+                    contentContainerStyle={{ width: windowWidth - 33, justifyContent: 'space-between' }}
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item, index }) => <TouchableOpacity onPress={() => {
+                        setIndex(index),
                             setIndexVal(true)
-                            }} style={[styles.vendorView, { borderColor: Index === index ? '#FF9600' : '#DDDDDD' }]}>
-                            <Image source={item.image} style={styles.imageStyle} />
-                            <Text style={[styles.pickup, { marginLeft: 0, marginVertical: 10 }]}>{item.name}</Text>
-                        </TouchableOpacity>}
-                        keyExtractor={item => item.id}
-                    />
-                </View>
-                {indexVal?
+                    }} style={[styles.vendorView, { borderColor: Index === index ? '#FF9600' : '#DDDDDD' }]}>
+                        <Image source={item.image} style={styles.imageStyle} />
+                        <Text style={[styles.pickup, { marginLeft: 0, marginVertical: 10 }]}>{item.name}</Text>
+                    </TouchableOpacity>}
+                    keyExtractor={item => item.id}
+                />
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false} >
+                {indexVal ?
                     <>
                         <View style={styles.border}></View>
                         <View style={{ marginHorizontal: 15 }}>
@@ -133,7 +135,7 @@ export default function Home(props) {
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.countryName ? State.countryName : 'Country'}
+                                        placeholder={State.countryName ? State.countryName : 'State'}
                                         searchPlaceholder="Search..."
                                         value={State.country}
                                         itemTextStyle={{ color: Color.darkBlack }}
@@ -159,7 +161,7 @@ export default function Home(props) {
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.stateName ? State.stateName : 'State'}
+                                        placeholder={State.stateName ? State.stateName : 'District'}
                                         searchPlaceholder="Search..."
                                         value={State.state}
                                         itemTextStyle={{ color: Color.darkBlack }}
@@ -187,7 +189,7 @@ export default function Home(props) {
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.countryName ? State.countryName : 'Country'}
+                                        placeholder={State.countryName ? State.countryName : 'Town'}
                                         searchPlaceholder="Search..."
                                         value={State.country}
                                         itemTextStyle={{ color: Color.darkBlack }}
@@ -213,7 +215,7 @@ export default function Home(props) {
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.stateName ? State.stateName : 'State'}
+                                        placeholder={State.stateName ? State.stateName : 'Area'}
                                         searchPlaceholder="Search..."
                                         value={State.state}
                                         itemTextStyle={{ color: Color.darkBlack }}
@@ -238,17 +240,12 @@ export default function Home(props) {
                                     maxLength={200}
                                 />
                             </View>
-
-                            <TouchableOpacity style={styles.otpView}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate('BookRequest')} style={styles.otpView}>
                                 <Text style={styles.otp}>Submit</Text>
                             </TouchableOpacity>
                         </View></> : null}
 
             </ScrollView>
-
-
-
-
         </SafeAreaView>
     )
 }
@@ -258,7 +255,6 @@ const styles = StyleSheet.create({
     links: { color: Color.black, fontWeight: '400', fontSize: 16, textAlign: 'center', marginTop: 15 },
     pickup: { color: Color.pickup, marginLeft: 25, fontWeight: '500', fontSize: 14, textAlign: 'center' },
     flexContainer: { flexDirection: 'row', alignItems: 'center' },
-    flex: { flexDirection: 'row', justifyContent: 'space-between', },
     horizontal: { marginHorizontal: 15 },
     content: { fontWeight: '400', fontSize: 13, color: '#666666', textAlign: 'center', lineHeight: 30 },
     vendorView: { height: 120, width: windowWidth / 3 - 15, padding: 13, borderRadius: 10, marginTop: 20, borderWidth: 1 },

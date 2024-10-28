@@ -10,12 +10,10 @@ export default function DetailHeader(props) {
             <View style={styles.flexContainer}>
                 <TouchableOpacity onPress={()=>props.props.navigation.goBack()}>
                 <AntDesign name="left" color="black" size={25} />
-
                 </TouchableOpacity>
                 <Text style={styles.pickup}>Pickup Details</Text>
                 <AntDesign name="infocirlceo" size={25} color={Color.border} />
             </View>
-
         </SafeAreaView>
     )
 }

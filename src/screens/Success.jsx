@@ -38,3 +38,4 @@ const styles = StyleSheet.create({
     request: { color: Color.border, alignSelf: 'center', fontWeight: '400', fontSize: 12, lineHeight: 25 },
     success: { color: Color.orange, fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 35, marginTop: 10 }
 })
+
