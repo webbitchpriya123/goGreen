@@ -25,7 +25,6 @@ function App() {
   useEffect(() => {
     loadStoredValue();
   }, []);
-
   const screens = [
     { name: 'Splash', component: Splash },
     { name: 'Otp', component: Otp },
@@ -35,7 +34,6 @@ function App() {
     { name: 'WaterDay', component: WaterDay },
     { name: 'Success', component: Success },
   ];
-
   const loadStoredValue = async () => {
     try {
       const value = await AsyncStorage.getItem('user_id');
@@ -51,8 +49,8 @@ function App() {
     }
   };
   if (localValue === null) {
-    return <View />;
-  }
+   return <View />;
+  } 
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -62,7 +60,7 @@ function App() {
           animationTypeForReplace: 'pop',
           gestureEnabled: true,
         }}
-        initialRouteName={localValue ? "Home" : "Home"}
+        initialRouteName={localValue ? "BookRequest" : "Splash"}
       >
         {screens.map((item) => (
           <Stack.Screen key={item.name} name={item.name} component={item.component} />

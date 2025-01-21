@@ -1,35 +1,50 @@
-import React, { useState } from "react";
-import { SafeAreaView, Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, Text, TouchableOpacity, StyleSheet, View,TextInput } from "react-native";
 import * as Color from '../constant/colors';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Dropdown } from 'react-native-element-dropdown';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { gtAllMaterial, getVendor } from "../allApi/getAllApi";
+import { useIsFocused } from "@react-navigation/native";
+import moment from "moment";
 
 
 
 export default function BookRequest(props) {
-    const [material, setMaterial] = useState('');
-    const [weight, setWeight] = useState('');
+    const isFocused = useIsFocused();
+    const [material, setMaterial] = useState([]);
     const [date, setDate] = useState(new Date());
     const [dateVal, setDateVal] = useState('');
+    const [vendor, setVendor] = useState([]);
+    const [vendorId, setVendorId] = useState('');
     const [showCalender, setShowCalender] = useState(false);
+    const [materialId, setMaterialId] = useState('');
+    const [weight , setWeight] =  useState('');
 
-    const countries = [
+    useEffect(() => {
+        allData();
+    }, [isFocused]);
 
-    ]
-
+    const allData = async () => {
+        const all = await gtAllMaterial();
+        setMaterial(all);
+        const vendor = await getVendor();
+        setVendor(vendor);
+    }
 
     const onChange = (event, selectedDate) => {
         if (event.type === "set") { // This ensures the user clicked 'OK' instead of dismissing the picker
             const currentDate = selectedDate || date;
-            setShow(false); // Hide the DateTimePicker
-            const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-            setDateVal(formattedDate);
+            setDateVal(currentDate);
+            setShowCalender(false); // Hide the DateTimePicker
         } else {
-            setShow(false); // Hide DateTimePicker if user dismisses it
+            setShowCalender(false); // Hide DateTimePicker if user dismisses it
         }
     };
 
+    const onSubmit = () => {
+        props.navigation.navigate('Success');
+    }
 
     return (
         <SafeAreaView style={styles.background}>
@@ -45,58 +60,32 @@ export default function BookRequest(props) {
                 <View style={{ margin: 15 }}>
                     <Text style={[styles.address, { color: Color.nameColor }]}>Material Type</Text>
                     <Dropdown
-                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: material ? 0 : '#F0F5FA' }]}
+                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: materialId ? 0 : '#F0F5FA' }]}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         inputSearchStyle={styles.inputSearchStyle}
                         iconStyle={styles.iconStyle}
-                        data={countries}
+                        data={material}
                         containerStyle={{ borderRadius: 15 }}
                         maxHeight={300}
                         labelField="name"
                         valueField="id"
-                        placeholder={material ? material : 'Select'}
+                        placeholder={materialId ? materialId : 'Select'}
                         searchPlaceholder="Search..."
-                        value={material}
+                        value={materialId}
                         itemTextStyle={{ color: Color.darkBlack }}
                         onChange={item => {
-                            setState(prevState => ({
-                                ...prevState,
-                                setMaterial: item.id
-                            }))
+                            setMaterialId(item.id)
                         }
                         }
                     />
-                    <Text style={[styles.address, { color: Color.nameColor, marginTop: 10 }]}>Vendor Type</Text>
-                    <Dropdown
-                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: material ? 0 : '#F0F5FA' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        iconStyle={styles.iconStyle}
-                        data={countries}
-                        containerStyle={{ borderRadius: 15 }}
-                        maxHeight={300}
-                        labelField="name"
-                        valueField="id"
-                        placeholder={material ? material : 'Select'}
-                        searchPlaceholder="Search..."
-                        value={material}
-                        itemTextStyle={{ color: Color.darkBlack }}
-                        onChange={item => {
-                            setState(prevState => ({
-                                ...prevState,
-                                setMaterial: item.id
-                            }))
-                        }
-                        }
-                    />
+
                     <View style={styles.flex}>
                         <View style={styles.flex47}>
                             <Text style={[styles.address, { color: Color.nameColor, marginTop: 10 }]}>Date</Text>
                             <View style={[styles.dropdown, styles.flex, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: material ? 0 : '#F0F5FA' }]}
                             >
-                                <Text>dd/mm/yyyy</Text>
+                                <Text>{dateVal ? moment(dateVal).format('DD/MM/YYYY') : 'dd/mm/yyyy'}</Text>
                                 <TouchableOpacity onPress={() => setShowCalender(!showCalender)}>
                                     <AntDesign name="calendar" size={20} color={Color.black} />
                                 </TouchableOpacity>
@@ -105,33 +94,43 @@ export default function BookRequest(props) {
                         <View style={styles.flex47}>
                             <Text style={[styles.address, { color: Color.nameColor, marginTop: 10 }]}>Vendor Type</Text>
                             <Dropdown
-                                style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: material ? 0 : '#F0F5FA' }]}
+                                style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: vendorId ? 0 : '#F0F5FA' }]}
                                 placeholderStyle={styles.placeholderStyle}
                                 selectedTextStyle={styles.selectedTextStyle}
                                 inputSearchStyle={styles.inputSearchStyle}
                                 iconStyle={styles.iconStyle}
-                                data={countries}
+                                data={vendor}
                                 containerStyle={{ borderRadius: 15 }}
                                 maxHeight={300}
                                 labelField="name"
                                 valueField="id"
-                                placeholder={material ? material : 'Select'}
+                                placeholder={vendorId ? vendorId : 'Select'}
                                 searchPlaceholder="Search..."
-                                value={material}
+                                value={vendorId}
                                 itemTextStyle={{ color: Color.darkBlack }}
                                 onChange={item => {
-                                    setState(prevState => ({
-                                        ...prevState,
-                                        setMaterial: item.id
-                                    }))
+                                    setVendorId(item.id)
                                 }
                                 }
                             />
                         </View>
                     </View>
+
+                    <Text style={[styles.address, { color: Color.nameColor, marginTop: 10 }]}>Weight</Text>
+
+
+                    <TextInput
+                            style={styles.input}
+                            placeholder={'weight'}
+                            placeholderTextColor={'#7F8192'}
+                            keyboardType="numeric"
+                            value={weight}
+                            onChangeText={(text)=>setWeight(text)}
+                        />
+
+                    
                 </View>
             </View>
-
             {showCalender && (
                 <DateTimePicker
                     testID="dateTime"
@@ -141,9 +140,10 @@ export default function BookRequest(props) {
                     onChange={onChange}
                 />
             )}
-
             <View style={styles.flex1}>
-                <TouchableOpacity onPress={() => props.navigation.navigate('Success')} style={styles.submitView}>
+                <TouchableOpacity onPress={() =>
+                    onSubmit()
+                } style={styles.submitView}>
                     <Text style={styles.submit}>Submit</Text>
                 </TouchableOpacity>
             </View>
@@ -188,5 +188,13 @@ const styles = StyleSheet.create({
     submitView: { borderRadius: 5, backgroundColor: Color.green, height: 55, marginHorizontal: 15, justifyContent: 'center' },
     submit: { color: Color.white, fontSize: 14, textAlign: 'center', fontWeight: '400' },
     flex9: { flex: 0.9 },
-    flex1: { flex: 0.1 }
+    flex1: { flex: 0.1 },
+    input: {
+        height: 55,
+        padding: 10,
+        borderRadius: 10,
+        color: '#7F8192',
+        marginTop: 12,
+        backgroundColor: '#F5F6FA'
+    },
 })

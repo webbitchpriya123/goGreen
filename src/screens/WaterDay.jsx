@@ -58,11 +58,9 @@ export default function WaterDay(props) {
                 <View style={[styles.flexContainer, { justifyContent: 'space-between' }]}>
                     <TouchableOpacity onPress={() => props.props.navigation.goBack()}>
                         <AntDesign name="left" color="black" size={25} />
-
                     </TouchableOpacity>
                     <Text style={styles.pickup}>Water day calender</Text>
                     <Entypo name="dots-three-vertical" size={20} color={Color.border} />
-
                 </View>
                 <Text style={[styles.title, { marginVertical: 15 }]}>Upcoming</Text>
                 <View style={styles.upcomeContainer}>
@@ -76,12 +74,10 @@ export default function WaterDay(props) {
                         <View style={styles.flexContainer}>
                             <AntDesign name="clockcircle" size={20} color={Color.water} style={{ marginRight: 7 }} />
                             <Text style={styles.date}>12.00 - 16.00</Text>
-
                         </View>
                     </View>
                 </View>
                 <Text style={[styles.title, { marginTop: 15 }]}>Previous</Text>
-
                 <FlatList
                     data={waste}
                     vertical
@@ -98,17 +94,13 @@ export default function WaterDay(props) {
                                 <View style={styles.flexContainer}>
                                     <AntDesign name="clockcircle" size={20} color={Color.water} style={{ marginRight: 7 }} />
                                     <Text style={styles.date}>12.00 - 16.00</Text>
-
                                 </View>
                             </View>
                         </View>
                     }
                     keyExtractor={item => item.id}
                 />
-
             </View>
-
-
         </SafeAreaView>
     )
 }

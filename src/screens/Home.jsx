@@ -6,55 +6,99 @@ import home from '../assests/home.png';
 import industry from '../assests/industry.png';
 import vendorRegister from '../assests/vendorRegister.png';
 import { Dropdown } from 'react-native-element-dropdown';
-import { getAllState } from "../allApi/getAllApi";
+import { getAllDistrict, getAllState, getTown, getArea, Register } from "../allApi/getAllApi";
 
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function Home(props) {
+
+    const { params } = props.route;
     const [Index, setIndex] = useState('');
     const [indexVal, setIndexVal] = useState(false);
     const [states, setStates] = useState([]);
-    const [countries, setCountries] = useState([]);
+    const [district, setDistirct] = useState([]);
     const [town, setTown] = useState([]);
-    const [area, setAreas] = useState([]);
+    const [area, setArea] = useState([]);
     const [State, setState] = useState({
         name: '',
         email: '',
         state: '',
-        country: '',
+        district: "",
         stateName: '',
-        countryName: '',
+        districtName: '',
         address: '',
-        industry: ''
+        industry: '',
+        town: '',
+        townName: '',
+        areaName: '',
+        area: '',
+        id: '',
+        pincode: ''
+
     })
+    const [errors, setErrors] = useState({});
+
 
     useEffect(() => {
         allStates();
     }, []);
 
+
+
     const allStates = async () => {
-
         const all = await getAllState();
+        setStates(all);
+    }
 
+    const allDist = async (id) => {
+        const dist = await getAllDistrict(id);
+        setDistirct(dist);
+    }
+
+    const allTown = async (id) => {
+        const town = await getTown(id);
+        setTown(town);
+    }
+
+    const allArea = async (id) => {
+        const area = await getArea(id);
+        setArea(area);
     }
 
 
     const categoryList = [
         {
             image: home,
-            name: 'Household Waste'
+            name: 'Household Waste',
+            id: 1
 
         },
         {
             image: industry,
-            name: 'Industry Wastage'
+            name: 'Industry Wastage',
+            id: 2
         },
         {
             image: vendorRegister,
-            name: 'Vendor Register'
+            name: 'Vendor Register',
+            id: 3
         }
     ]
+
+
+    const onRegister = async () => {
+        if ((State.name || State.industry) && State.email && State.state && State.district && State.area && State.town && State.pincode && State.address !== '') {
+            console.log("safdfasfasdfdsafasdfsa");
+
+            const reg = await Register(State, params);
+            if (reg.data) {
+                props.navigation.navigate('Otp', { phone: params.phone, name: 'Register', id: reg.data.id })
+            }
+        } else {
+            alert('Please fil all fields')
+        }
+    }
 
     const onChangeText = (name) => (value) => {
         setState({
@@ -62,6 +106,9 @@ export default function Home(props) {
             [name]: value,
         });
     };
+
+
+
 
     return (
         <SafeAreaView style={styles.background}>
@@ -78,6 +125,10 @@ export default function Home(props) {
                     contentContainerStyle={{ width: windowWidth - 33, justifyContent: 'space-between' }}
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item, index }) => <TouchableOpacity onPress={() => {
+                        setState(prevState => ({
+                            ...prevState,
+                            id: item.id,
+                        }))
                         setIndex(index),
                             setIndexVal(true)
                     }} style={[styles.vendorView, { borderColor: Index === index ? '#FF9600' : '#DDDDDD' }]}>
@@ -111,6 +162,8 @@ export default function Home(props) {
                                         value={State.industry}
                                         placeholder="Enter your industry name "
                                     />
+                                    {errors.name && <Text style={{ color: 'red' }}>{errors.name}</Text>}
+
                                 </View> : null}
                             <View>
                                 <Text style={[styles.address, { color: Color.nameColor }]}>Email</Text>
@@ -125,32 +178,6 @@ export default function Home(props) {
                                 <View style={{ flex: 0.47 }}>
                                     <Text style={[styles.address, { color: Color.nameColor }]}>State</Text>
                                     <Dropdown
-                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.country || State.countryName ? 0 : '#F0F5FA' }]}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        selectedTextStyle={styles.selectedTextStyle}
-                                        inputSearchStyle={styles.inputSearchStyle}
-                                        iconStyle={styles.iconStyle}
-                                        data={countries}
-                                        containerStyle={{ borderRadius: 15 }}
-                                        maxHeight={300}
-                                        labelField="name"
-                                        valueField="id"
-                                        placeholder={State.countryName ? State.countryName : 'State'}
-                                        searchPlaceholder="Search..."
-                                        value={State.country}
-                                        itemTextStyle={{ color: Color.darkBlack }}
-                                        onChange={item => {
-                                            setState(prevState => ({
-                                                ...prevState,
-                                                country: item.id
-                                            }))
-                                        }
-                                        }
-                                    />
-                                </View>
-                                <View style={{ flex: 0.47 }}>
-                                    <Text style={[styles.address, { color: Color.nameColor }]}>District</Text>
-                                    <Dropdown
                                         style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.state || State.stateName ? 0 : '#F0F5FA' }]}
                                         placeholderStyle={styles.placeholderStyle}
                                         selectedTextStyle={styles.selectedTextStyle}
@@ -161,15 +188,45 @@ export default function Home(props) {
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.stateName ? State.stateName : 'District'}
+                                        placeholder={State.stateName ? State.stateName : 'State'}
                                         searchPlaceholder="Search..."
                                         value={State.state}
                                         itemTextStyle={{ color: Color.darkBlack }}
                                         onChange={item => {
                                             setState(prevState => ({
                                                 ...prevState,
-                                                state: item.country_id
+                                                state: item.id,
+                                                stateName: item.name
                                             }))
+                                            allDist(item.id)
+                                        }
+                                        }
+                                    />
+                                </View>
+                                <View style={{ flex: 0.47 }}>
+                                    <Text style={[styles.address, { color: Color.nameColor }]}>District</Text>
+                                    <Dropdown
+                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.district ? 0 : '#F0F5FA' }]}
+                                        placeholderStyle={styles.placeholderStyle}
+                                        selectedTextStyle={styles.selectedTextStyle}
+                                        inputSearchStyle={styles.inputSearchStyle}
+                                        iconStyle={styles.iconStyle}
+                                        data={district}
+                                        containerStyle={{ borderRadius: 15 }}
+                                        maxHeight={300}
+                                        labelField="name"
+                                        valueField="id"
+                                        placeholder={State.districtName ? State.districtName : 'District'}
+                                        searchPlaceholder="Search..."
+                                        value={State.district}
+                                        itemTextStyle={{ color: Color.darkBlack }}
+                                        onChange={item => {
+                                            setState(prevState => ({
+                                                ...prevState,
+                                                district: item.id,
+                                                districtName: item.name
+                                            }))
+                                            allTown(item.id)
                                         }
                                         }
                                     />
@@ -179,25 +236,27 @@ export default function Home(props) {
                                 <View style={{ flex: 0.47 }}>
                                     <Text style={[styles.address, { color: Color.nameColor }]}>Town</Text>
                                     <Dropdown
-                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.country || State.countryName ? 0 : '#F0F5FA' }]}
+                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.town ? 0 : '#F0F5FA' }]}
                                         placeholderStyle={styles.placeholderStyle}
                                         selectedTextStyle={styles.selectedTextStyle}
                                         inputSearchStyle={styles.inputSearchStyle}
                                         iconStyle={styles.iconStyle}
-                                        data={countries}
+                                        data={town}
                                         containerStyle={{ borderRadius: 15 }}
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.countryName ? State.countryName : 'Town'}
+                                        placeholder={State.townName ? State.townName : 'Town'}
                                         searchPlaceholder="Search..."
-                                        value={State.country}
+                                        value={State.town}
                                         itemTextStyle={{ color: Color.darkBlack }}
                                         onChange={item => {
                                             setState(prevState => ({
                                                 ...prevState,
-                                                country: item.id
+                                                town: item.id,
+                                                townName: item.name
                                             }))
+                                            allArea(item.id)
                                         }
                                         }
                                     />
@@ -205,24 +264,25 @@ export default function Home(props) {
                                 <View style={{ flex: 0.47 }}>
                                     <Text style={[styles.address, { color: Color.nameColor }]}>Area</Text>
                                     <Dropdown
-                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.state || State.stateName ? 0 : '#F0F5FA' }]}
+                                        style={[styles.dropdown, { borderWidth: 2, borderColor: '#EEEEEE', backgroundColor: State.area ? 0 : '#F0F5FA' }]}
                                         placeholderStyle={styles.placeholderStyle}
                                         selectedTextStyle={styles.selectedTextStyle}
                                         inputSearchStyle={styles.inputSearchStyle}
                                         iconStyle={styles.iconStyle}
-                                        data={states}
+                                        data={area}
                                         containerStyle={{ borderRadius: 15 }}
                                         maxHeight={300}
                                         labelField="name"
                                         valueField="id"
-                                        placeholder={State.stateName ? State.stateName : 'Area'}
+                                        placeholder={State.areaName ? State.areaName : 'Area'}
                                         searchPlaceholder="Search..."
-                                        value={State.state}
+                                        value={State.area}
                                         itemTextStyle={{ color: Color.darkBlack }}
                                         onChange={item => {
                                             setState(prevState => ({
                                                 ...prevState,
-                                                state: item.country_id
+                                                area: item.id,
+                                                areaName: item.name
                                             }))
                                         }
                                         }
@@ -230,17 +290,27 @@ export default function Home(props) {
                                 </View>
                             </View>
 
-                            <View style={{ marginTop: 15 }}>
+                            <View>
+                                <Text style={[styles.address, { color: Color.nameColor, marginTop: 10 }]}>Pincode</Text>
+                                <TextInput
+                                    style={[styles.input, { backgroundColor: State.pincode.length ? 0 : '#F0F5FA' }]}
+                                    onChangeText={onChangeText('pincode')}
+                                    value={State.pincode}
+                                    placeholder="Enter your pincode"
+                                />
+                            </View>
+
+                            <View >
                                 <Text style={[styles.address, { color: Color.nameColor }]} >Address</Text>
                                 <TextInput
                                     style={[styles.input, { height: 90, backgroundColor: State.address.length ? 0 : '#F0F5FA' }]}
-                                    onChangeText={onChangeText('name')}
+                                    onChangeText={onChangeText('address')}
                                     value={State.address}
                                     placeholder="Enter your address"
                                     maxLength={200}
                                 />
                             </View>
-                            <TouchableOpacity onPress={() => props.navigation.navigate('BookRequest')} style={styles.otpView}>
+                            <TouchableOpacity onPress={() => onRegister()} style={styles.otpView}>
                                 <Text style={styles.otp}>Submit</Text>
                             </TouchableOpacity>
                         </View></> : null}

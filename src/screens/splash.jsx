@@ -3,11 +3,14 @@ import { SafeAreaView, TextInput, Image, Text, FlatList, ScrollView, TouchableOp
 import Header from "../component/header";
 import BannerView from '../component/bannerView';
 import * as Color from '../constant/colors';
-import pickUp from '../assests/pickup.png';
 import homeBanner from '../assests/homebanner.png';
 import water from '../assests/water.png';
+import pickup from '../assests/pickup.png';
 import Feather from 'react-native-vector-icons/Feather';
-import OTPInputView from '@twotalltotems/react-native-otp-input'
+import OTPInputView from '@twotalltotems/react-native-otp-input';
+import { Login, userOtp } from "../allApi/getAllApi";
+import { getUserId } from "../allApi/localStorage";
+import { useIsFocused } from "@react-navigation/native";
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -16,16 +19,22 @@ export default function Splash(props) {
     const refRBSheet = useRef();
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState(false);
-
+    const [code, setCode] = useState('');
+    const [idVal, setIdVal] = useState('');
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        // refRBSheet.current.open();
+        getId();
+    }, [isFocused])
 
-    }, [])
+    const getId = async () => {
+        const id = await getUserId();
+        setIdVal(id)
+    }
 
     const categoryList = [
         {
-            image: pickUp,
+            image: pickup,
             name: 'Pickup Details'
         },
         {
@@ -34,12 +43,37 @@ export default function Splash(props) {
         }
     ]
 
+    const otpLogin = async () => {
+        const login = await Login(mobile);
+        if (login.user === 'new_user') {
+            props.navigation.navigate('Home', { phone: mobile })
+
+        } else {
+            props.navigation.navigate('Otp', { phone: mobile, id: login.data.id, name: 'Login' })
+        }
+    }
+
+    const onCodeChage = async (cod) => {
+        let login = await Login(mobile);
+        const user = await userOtp(login.data.id, cod);
+        alert(user.message);
+    }
+
+    const pickUp = (name) => {
+        if (idVal) {
+            props.navigation.navigate('PickUpDetail')
+
+        } else {
+            alert('please Login ')
+        }
+    }
+
     return (
         <SafeAreaView style={styles.background}>
             <StatusBar
                 backgroundColor={Color.white}
             />
-            <View style={[styles.flex8, { flex: mobile.length > 0 ? 0.7 : 0.8 }]}>
+            <View style={[styles.flex8, { flex: idVal ? 1 : mobile.length > 0 ? 0.7 : 0.8 }]}>
                 <Header props={props} />
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <BannerView />
@@ -50,7 +84,11 @@ export default function Splash(props) {
                             horizontal
                             contentContainerStyle={{ width: windowWidth - 30, justifyContent: 'space-between' }}
                             showsHorizontalScrollIndicator={false}
-                            renderItem={({ item, index }) => <TouchableOpacity onPress={() => props.navigation.navigate('PickUpDetail')} style={[styles.vendorView, { backgroundColor: index === 0 ? '#EFD1A4' : '#EFA4A4' }]}>
+                            renderItem={({ item, index }) => <TouchableOpacity onPress={() => {
+                                pickUp('pickup');
+
+
+                            }} style={[styles.vendorView, { backgroundColor: index === 0 ? '#EFD1A4' : '#EFA4A4' }]}>
                                 <View style={styles.flex}>
                                     <Image source={item.image} style={{ marginTop: 15 }} />
                                     <View style={styles.arrowView}>
@@ -68,40 +106,57 @@ export default function Splash(props) {
                     </View>
                 </ScrollView>
             </View>
-            <View style={[styles.flexBottom, { flex: mobile.length > 0 ? 0.32 : 0.18 }]}>
-                <View style={styles.bottomView}>
-                    <Text style={styles.login}>{otp ? 'Verify OTP' : 'Login / Register'}</Text>
-                </View>
-                <View style={{ margin: 15 }}>
-                    <Text style={styles.links}>{otp ? 'OTP sent to mobile number : 98765 45678' : 'Enter mobile number'}</Text>
-                    {otp ?
-                        <View>
 
-                            <OTPInputView
-                                codeInputFieldStyle={styles.underlineStyleBase}
-                                style={styles.otpContainer}
-                                pinCount={4}
-                            />
-                            <Text style={{ textAlign: 'center', marginTop: 7 }}>Resend OTP in 26 sec</Text>
-                        </View>
+            {!idVal ?
+                <View style={[styles.flexBottom, { flex: mobile.length > 0 ? 0.32 : 0.18 }]}>
+                    <View style={styles.bottomView}>
+                        <Text style={styles.login}>{otp ? 'Verify OTP' : 'Login / Register'}</Text>
+                    </View>
+                    <View style={{ margin: 15 }}>
+                        <Text style={styles.links}>{otp ? `OTP sent to mobile number : ${mobile}` : 'Enter mobile number'}</Text>
+                        {otp ?
+                            <View>
+                                <OTPInputView
+                                    codeInputFieldStyle={styles.underlineStyleBase}
+                                    style={styles.otpContainer}
+                                    pinCount={4}
+                                    code={code}
+                                    onCodeChanged={code => {
+                                        setOtp(code)
+                                    }}
+                                />
+                                <Text style={{ textAlign: 'center', marginTop: 7 }}>Resend OTP in 26 sec</Text>
+                            </View>
+                            :
+                            <View style={[styles.flexContainer, { borderWidth: 1, borderColor: '#BBBBBB', marginTop: 10 }]}>
+                                <Feather name="phone-call" size={25} color={Color.black} style={{ marginLeft: 6 }} />
+                                <TextInput
+                                    style={[styles.input]}
+                                    onChangeText={(text) => setMobile(text)}
+                                    value={mobile}
+                                    maxLength={10}
+                                    placeholder="Phone Number"
+                                />
+                            </View>}
+                        {mobile.length && !otp ?
+                            <TouchableOpacity
+                                activeOpacity={0.3}
+                                onPress={() => {
+                                    otpLogin();
+                                }} style={styles.otpView}>
+                                <Text style={styles.otp}>{'Get Otp'}</Text>
+                            </TouchableOpacity> : null}
 
-                        :
-                        <View style={[styles.flexContainer, { borderWidth: 1, borderColor: '#BBBBBB', marginTop: 10 }]}>
-                            <Feather name="phone-call" size={25} color={Color.black} style={{ marginLeft: 6 }} />
-                            <TextInput
-                                style={[styles.input]}
-                                onChangeText={(text) => setMobile(text)}
-                                value={mobile}
-                                placeholder="Phone Number"
-                            />
-                        </View>}
-                    {mobile.length ?
-
-                        <TouchableOpacity onPress={() => setOtp(true)} style={styles.otpView}>
-                            <Text style={styles.otp}>{otp ? 'Continue' : 'Get Otp'}</Text>
-                        </TouchableOpacity> : null}
-                </View>
-            </View>
+                        {mobile.length && otp ?
+                            <TouchableOpacity
+                                activeOpacity={0.3}
+                                onPress={() => {
+                                    onCodeChage();
+                                }} style={styles.otpView}>
+                                <Text style={styles.otp}>{'Continue'}</Text>
+                            </TouchableOpacity> : null}
+                    </View>
+                </View> : null}
 
         </SafeAreaView>
     )
